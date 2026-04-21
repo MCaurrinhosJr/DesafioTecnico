@@ -15,6 +15,21 @@ A Good Hamburger API é uma aplicação RESTful que serve como backend para um r
 - **Discount Calculation**: Calcula descontos aplicáveis aos pedidos.
 - **Error Handling**: Customização no tratamento de erros através de middleware.
 
+## Cardápio
+| Tipo | Item | Preço (R$) |
+|------|------|------------|
+| Sanduíche | X Burger | 5,00 |
+| Sanduíche | X Egg | 4,50 |
+| Sanduíche | X Bacon | 7,00 |
+| Acompanhamento | Batata Frita | 2,00 |
+| Bebida | Refrigerante | 2,50 |
+
+## Regras de Desconto
+- **Sanduíche + Batata + Refrigerante → 20% de desconto**  
+- **Sanduíche + Refrigerante → 15% de desconto**  
+- **Sanduíche + Batata → 10% de desconto**  
+- Cada pedido pode conter apenas um sanduíche, uma batata e um refrigerante. Itens duplicados retornam mensagem de erro clara
+
 ## Endpoints da API
 
 ### 1. Menu
