@@ -21,7 +21,7 @@ namespace GoodHamburger.Core.Services
         private readonly IDiscountService _discountService = discountService;
         public async Task<Order> CreateOrder(Order order)
         {
-            _validator.Validate(order);
+            await _validator.ValidateAsync(order);
 
             ApplyPricing(order);
 
@@ -30,7 +30,7 @@ namespace GoodHamburger.Core.Services
 
         public async Task<Order> UpdateOrder(int id, Order order)
         {
-            _validator.Validate(order);
+            await _validator.ValidateAsync(order);
 
             ApplyPricing(order);
 

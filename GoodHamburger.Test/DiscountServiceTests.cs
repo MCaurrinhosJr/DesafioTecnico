@@ -16,15 +16,15 @@ namespace GoodHamburger.Test
             {
                 Items =
                 [
-                    new() { Type = OrderItemType.Burger, Price = 10 },
-                    new() { Type = OrderItemType.Side, Price = 5 },
-                    new() { Type = OrderItemType.Drink, Price = 5 }
+                    new() { Type = OrderItemType.Burger, Price = 5.00m },
+                    new() { Type = OrderItemType.Side, Price = 2.00m },
+                    new() { Type = OrderItemType.Drink, Price = 2.50m }
                 ]
             };
 
             var discount = _service.CalculateDiscount(order, 20);
 
-            discount.Should().Be(4); // 20%
+            discount.Should().Be(1.95m); // 20% de 9.50
         }
 
         [Fact]
@@ -34,14 +34,14 @@ namespace GoodHamburger.Test
             {
                 Items =
                 [
-                    new() { Type = OrderItemType.Burger, Price = 10 },
-                    new() { Type = OrderItemType.Drink, Price = 5 }
+                    new() { Type = OrderItemType.Burger, Price = 5.00m },
+                    new() { Type = OrderItemType.Drink, Price = 2.50m }
                 ]
             };
 
             var discount = _service.CalculateDiscount(order, 15);
 
-            discount.Should().Be(2.25m); // 15%
+            discount.Should().Be(1.125m); // 15% de 7.50
         }
 
         [Fact]
@@ -51,14 +51,14 @@ namespace GoodHamburger.Test
             {
                 Items =
                 [
-                    new() { Type = OrderItemType.Burger, Price = 10 },
-                    new() { Type = OrderItemType.Side, Price = 5 }
+                    new() { Type = OrderItemType.Burger, Price = 5.00m },
+                    new() { Type = OrderItemType.Side, Price = 2.00m }
                 ]
             };
 
-            var discount = _service.CalculateDiscount(order, 15);
+            var discount = _service.CalculateDiscount(order, 10);
 
-            discount.Should().Be(1.5m); // 10%
+            discount.Should().Be(0.7m); // 10% de 7.00
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace GoodHamburger.Test
         {
             var order = new Order
             {
-                Items = [new() { Type = OrderItemType.Burger, Price = 10 }]
+                Items = [new() { Type = OrderItemType.Burger, Price = 5.00m }]
             };
 
             var discount = _service.CalculateDiscount(order, 10);
@@ -81,8 +81,8 @@ namespace GoodHamburger.Test
             {
                 Items =
                 [
-                    new() { Type = OrderItemType.Side, Price = 5 },
-                    new() { Type = OrderItemType.Drink, Price = 5 }
+                    new() { Type = OrderItemType.Side, Price = 2.00m },
+                    new() { Type = OrderItemType.Drink, Price = 2.50m }
                 ]
             };
 

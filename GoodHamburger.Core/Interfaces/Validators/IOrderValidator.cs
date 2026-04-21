@@ -9,6 +9,6 @@ namespace GoodHamburger.Core.Interfaces.Validators
 {
     public interface IOrderValidator
     {
-        void Validate(Order order);
+        Task ValidateAsync(Order order);
     }
 }

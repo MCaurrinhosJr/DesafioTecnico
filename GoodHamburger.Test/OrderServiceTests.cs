@@ -23,18 +23,18 @@ namespace GoodHamburger.Test
         {
             var order = new Order
             {
-                Items = [new() { Price = 10 }, new() { Price = 5 }]
+                Items = [new() { Price = 5.00m }, new() { Price = 2.00m }]
             };
 
-            _discountMock.Setup(x => x.CalculateDiscount(order, 15)).Returns(3);
+            _discountMock.Setup(x => x.CalculateDiscount(order, 15)).Returns(0.7m);
             _repoMock.Setup(x => x.CreateOrder(It.IsAny<Order>())).ReturnsAsync(order);
 
             var service = CreateService();
             var result = await service.CreateOrder(order);
 
-            result.Price.Should().Be(15);
-            result.Discount.Should().Be(3);
-            result.TotalPrice.Should().Be(12);
+            result.Price.Should().Be(7.00m);
+            result.Discount.Should().Be(0.7m);
+            result.TotalPrice.Should().Be(6.3m);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace GoodHamburger.Test
             var order = new Order { Items = [new() { Price = 10 }] };
             var service = CreateService();
             await service.CreateOrder(order);
-            _validatorMock.Verify(x => x.Validate(order), Times.Once);
+            _validatorMock.Verify(x => x.ValidateAsync(order), Times.Once);
         }
 
         [Fact]

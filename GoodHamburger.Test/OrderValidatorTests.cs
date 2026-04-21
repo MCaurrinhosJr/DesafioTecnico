@@ -1,81 +1,133 @@
+using GoodHamburger.Core.Interfaces.Repositories;
 using GoodHamburger.Core.Models;
 using GoodHamburger.Core.Validators;
 using FluentAssertions;
+using Moq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace GoodHamburger.Test
 {
     public class OrderValidatorTests
     {
-        private readonly OrderValidator _validator = new();
+        private readonly Mock<IMenuRepository> _menuRepoMock = new();
+        private readonly OrderValidator _validator;
+
+        public OrderValidatorTests()
+        {
+            _validator = new OrderValidator(_menuRepoMock.Object);
+        }
+
+        private void SetupMenu(params MenuItem[] items)
+        {
+            _menuRepoMock.Setup(x => x.GetMenuItemsAsync())
+                .ReturnsAsync(new List<MenuItem>(items));
+        }
 
         [Fact]
-        public void Should_Throw_When_No_Items()
+        public async Task Should_Throw_When_No_Items()
         {
             var order = new Order();
-            var act = () => _validator.Validate(order);
-            act.Should().Throw<ArgumentException>().WithMessage("*pelo menos um item*");
+            await _validator.Invoking(v => v.ValidateAsync(order))
+                            .Should().ThrowAsync<ArgumentException>()
+                            .WithMessage("*pelo menos um item*");
         }
 
         [Fact]
-        public void Should_Throw_When_Two_Burgers()
+        public async Task Should_Throw_When_Two_Burgers()
         {
+            SetupMenu(new MenuItem { Id = 1, Name = "X Burger", Type = OrderItemType.Burger, Price = 10 });
+
             var order = new Order
             {
-                Items =
-                [
-                    new() { Type = OrderItemType.Burger },
-                    new() { Type = OrderItemType.Burger }
-                ]
+                Items = new List<OrderItem>
+                {
+                    new() { MenuItemId = 1, Type = OrderItemType.Burger, Price = 10 },
+                    new() { MenuItemId = 1, Type = OrderItemType.Burger, Price = 10 }
+                }
             };
-            var act = () => _validator.Validate(order);
-            act.Should().Throw<ArgumentException>().WithMessage("*sanduíche*");
+
+            await _validator.Invoking(v => v.ValidateAsync(order))
+                            .Should().ThrowAsync<ArgumentException>()
+                            .WithMessage("*sanduíche*");
         }
 
         [Fact]
-        public void Should_Throw_When_Two_Sides()
+        public async Task Should_Throw_When_Item_Not_In_Menu()
         {
+            SetupMenu(new MenuItem { Id = 1, Name = "X Burger", Type = OrderItemType.Burger, Price = 10 });
+
             var order = new Order
             {
-                Items =
-                [
-                    new() { Type = OrderItemType.Side },
-                    new() { Type = OrderItemType.Side }
-                ]
+                Items = new List<OrderItem>
+                {
+                    new() { MenuItemId = 2, Type = OrderItemType.Side, Price = 5 }
+                }
             };
-            var act = () => _validator.Validate(order);
-            act.Should().Throw<ArgumentException>().WithMessage("*batata*");
+
+            await _validator.Invoking(v => v.ValidateAsync(order))
+                            .Should().ThrowAsync<ArgumentException>()
+                            .WithMessage("*não existe no menu*");
         }
 
         [Fact]
-        public void Should_Throw_When_Two_Drinks()
+        public async Task Should_Throw_When_Type_Mismatch()
         {
+            SetupMenu(new MenuItem { Id = 1, Name = "X Burger", Type = OrderItemType.Burger, Price = 10 });
+
             var order = new Order
             {
-                Items =
-                [
-                    new() { Type = OrderItemType.Drink },
-                    new() { Type = OrderItemType.Drink }
-                ]
+                Items = new List<OrderItem>
+                {
+                    new() { MenuItemId = 1, Type = OrderItemType.Side, Price = 10 }
+                }
             };
-            var act = () => _validator.Validate(order);
-            act.Should().Throw<ArgumentException>().WithMessage("*refrigerante*");
+
+            await _validator.Invoking(v => v.ValidateAsync(order))
+                            .Should().ThrowAsync<ArgumentException>()
+                            .WithMessage("*tipo inválido*");
         }
 
         [Fact]
-        public void Should_Pass_When_Valid_Full_Combo()
+        public async Task Should_Throw_When_Price_Mismatch()
         {
+            SetupMenu(new MenuItem { Id = 1, Name = "X Burger", Type = OrderItemType.Burger, Price = 10 });
+
             var order = new Order
             {
-                Items =
-                [
-                    new() { Type = OrderItemType.Burger },
-                    new() { Type = OrderItemType.Side },
-                    new() { Type = OrderItemType.Drink }
-                ]
+                Items = new List<OrderItem>
+                {
+                    new() { MenuItemId = 1, Type = OrderItemType.Burger, Price = 12 }
+                }
             };
-            var act = () => _validator.Validate(order);
-            act.Should().NotThrow();
+
+            await _validator.Invoking(v => v.ValidateAsync(order))
+                            .Should().ThrowAsync<ArgumentException>()
+                            .WithMessage("*preço inválido*");
+        }
+
+        [Fact]
+        public async Task Should_Pass_When_Valid_Order()
+        {
+            SetupMenu(
+                new MenuItem { Id = 1, Name = "X Burger", Type = OrderItemType.Burger, Price = 10 },
+                new MenuItem { Id = 2, Name = "Batata Frita", Type = OrderItemType.Side, Price = 5 },
+                new MenuItem { Id = 3, Name = "Refrigerante", Type = OrderItemType.Drink, Price = 5 }
+            );
+
+            var order = new Order
+            {
+                Items = new List<OrderItem>
+                {
+                    new() { MenuItemId = 1, Type = OrderItemType.Burger, Price = 10 },
+                    new() { MenuItemId = 2, Type = OrderItemType.Side, Price = 5 },
+                    new() { MenuItemId = 3, Type = OrderItemType.Drink, Price = 5 }
+                }
+            };
+
+            await _validator.Invoking(v => v.ValidateAsync(order))
+                            .Should().NotThrowAsync();
         }
     }
 }
