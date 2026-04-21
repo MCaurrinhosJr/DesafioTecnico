@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="GoodHamburger.Core/GoodHamburger.Core.csproj" />
   <Project Path="GoodHamburger.Infra/GoodHamburger.Infra.csproj" />
+  <Project Path="GoodHamburger.Test/GoodHamburger.Test.csproj" Id="23e34f07-aa42-4302-ae01-43969fbb67a8" />
   <Project Path="GoodHamburger.WebApi/GoodHamburger.WebApi.csproj" />
 </Solution>
