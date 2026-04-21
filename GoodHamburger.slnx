@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="GoodHamburger.Core/GoodHamburger.Core.csproj" />
+  <Project Path="GoodHamburger.Infra/GoodHamburger.Infra.csproj" />
+  <Project Path="GoodHamburger.WebApi/GoodHamburger.WebApi.csproj" />
+</Solution>
